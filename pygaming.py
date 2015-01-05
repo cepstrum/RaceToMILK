@@ -11,17 +11,24 @@ black = (0,0,0)
 white = (255,255,255)
 red = (255,0,0)
 
-car_width = 88
+car_width = 74
+globalSpeed = 0 #speed everything falls at, increase to make things faster
+
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 
-pygame.display.set_caption('A bit Racey')
+pygame.display.set_caption('RaceToMILK')
 
 clock = pygame.time.Clock()
 
 carImg = pygame.image.load('racecar.png')
+enemyCarImgBlue = pygame.image.load('racecarBlue.png')
+
 
 def car(x,y):
 	gameDisplay.blit(carImg,(x,y))
+
+def enemyBlue(x,y):
+	gameDisplay.blit(enemyCarImgBlue,(x,y))
 
 def things(thingx, thingy, thingw, thingh, color):
 	pygame.draw.rect(gameDisplay, color, [thingx,thingy,thingw,thingh])
@@ -46,10 +53,14 @@ def crash():
 	message_display('You Crashed')
 
 def game_loop():
-	x = (display_width * 0.45)
-	y = (display_height * 0.8)
+	heroCarX = (display_width * 0.45)
+	heroCarY = (display_height - 74) #car is 74x74
 
-	x_change = 0
+	heroCarX_change = 0
+
+	enemyBlueX = random.randrange(0, display_width - 74) #img is 74x74
+	enemyBlueY = -600
+	enemyBlue_speed = 7 + globalSpeed
 
 	thing_startx = random.randrange(0, display_width)
 	thing_starty = -600
@@ -58,7 +69,7 @@ def game_loop():
 	thing_height = 100
 
 	gameExit = False
-	speed = 7 #speed of movement left or right
+	hero_LR_Speed = 7 #speed of movement left or right
 	while not gameExit:
 
 		for event in pygame.event.get():
@@ -67,33 +78,37 @@ def game_loop():
 				quit()
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_LEFT:
-					x_change = -speed
+					heroCarX_change = -hero_LR_Speed
 				if event.key == pygame.K_RIGHT:
-					x_change = speed
+					heroCarX_change = hero_LR_Speed
 
 			
 			
 
-		x += x_change
+		heroCarX += heroCarX_change
 
 		gameDisplay.fill(white)
 
 		#things(thingx, thingy, thingw, thingh, color):
 		things(thing_startx,thing_starty,thing_width,thing_height,black)
 		thing_starty += thing_speed
-		car(x,y)
+		car(heroCarX,heroCarY)
+		enemyBlue(enemyBlueX,enemyBlueY)
+		enemyBlueY += enemyBlue_speed
 
-		if x > display_width - car_width or x < 0:
+		if heroCarX > display_width - car_width or heroCarX < 0:
 			crash()
 
+		if enemyBlueY > display_height:
+			enemyBlueY = 0 - 74
 		if thing_starty > display_height:
 			thing_starty = 0 - thing_height
 			thing_startx = random.randrange(0,display_width)
 
-		if y < thing_starty + thing_height:
+		if heroCarY <= thing_starty + thing_height:
 			print('step 1')
-			if x > thing_startx and x < (thing_startx + thing_width) or (x + car_width) > thing_startx and (x + car_width) < (thing_startx + thing_width):
-				print ('x crossover')
+			if heroCarX > thing_startx and heroCarX < (thing_startx + thing_width) or (heroCarX + car_width) > thing_startx and (heroCarX + car_width) < (thing_startx + thing_width):
+				print ('heroCarX crossover')
 				crash()
 
 
