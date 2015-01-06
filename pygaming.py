@@ -4,6 +4,7 @@ import random
 
 pygame.init()
 
+
 display_width = 800
 display_height = 600
 
@@ -12,7 +13,9 @@ white = (255,255,255)
 red = (255,0,0)
 
 car_width = 74
-globalSpeed = 0 #speed everything falls at, increase to make things faster
+global_speed = 0 #speed everything falls at, increase to make things faster
+
+
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
 
@@ -21,7 +24,10 @@ pygame.display.set_caption('RaceToMILK')
 clock = pygame.time.Clock()
 
 carImg = pygame.image.load('racecar.png')
+enemycarImgYellow = pygame.image.load('racecarYellow.png')
+enemycarImgGreen = pygame.image.load('racecarGreen.png')
 enemyCarImgBlue = pygame.image.load('racecarBlue.png')
+billImg = pygame.image.load('bill.png')
 
 
 def car(x,y):
@@ -30,14 +36,24 @@ def car(x,y):
 def enemyBlue(x,y):
 	gameDisplay.blit(enemyCarImgBlue,(x,y))
 
+def enemyYellow(x,y):
+	gameDisplay.blit(enemyCarImgYellow,(x,y))
+
+def enemyGreen(x,y):
+	gameDisplay.blit(enemyCarImgGreen,(x,y))
+
+def bill(x,y):
+	gameDisplay.blit(billImg,(x,y))
+
 def things(thingx, thingy, thingw, thingh, color):
 	pygame.draw.rect(gameDisplay, color, [thingx,thingy,thingw,thingh])
+
 def text_objects(text,font):
 	textSurface = font.render(text, True, black)
 	return textSurface, textSurface.get_rect()
 
 def message_display(text):
-	largeText = pygame.font.Font('freesansbold.ttf', 115)
+	largeText = pygame.font.Font('freesansbold.ttf', 95)
 	TextSurf, TextRect = text_objects(text, largeText)
 	TextRect.center = ((display_width/2),(display_height/2))
 	gameDisplay.blit(TextSurf, TextRect)
@@ -56,11 +72,29 @@ def game_loop():
 	heroCarX = (display_width * 0.45)
 	heroCarY = (display_height - 74) #car is 74x74
 
+
 	heroCarX_change = 0
+
+	
+	
+
+	if random.randrange(0,11) == 10:
+		billY = -200
+	else:
+		billY = -2000
+
+	bill_left_or_right = random.randrange(0,2)
+	if bill_left_or_right == 0:
+		billX = 0
+	else:
+		billX = display_width
+
+	bill_speedY = 3 + global_speed
+	bill_speedX = 3
 
 	enemyBlueX = random.randrange(0, display_width - 74) #img is 74x74
 	enemyBlueY = -600
-	enemyBlue_speed = 7 + globalSpeed
+	enemyBlue_speed = 7 + global_speed
 
 	thing_startx = random.randrange(0, display_width)
 	thing_starty = -600
@@ -92,24 +126,52 @@ def game_loop():
 		#things(thingx, thingy, thingw, thingh, color):
 		things(thing_startx,thing_starty,thing_width,thing_height,black)
 		thing_starty += thing_speed
+
 		car(heroCarX,heroCarY)
 		enemyBlue(enemyBlueX,enemyBlueY)
+
+		
+		bill(billX,billY)
+
+		
+		billY += bill_speedY
+		if bill_left_or_right == 0 and billY > -141:
+			billX += bill_speedX
+		if bill_left_or_right == 1 and billY > -141:
+			billX -= bill_speedX
+		if billY > display_height:
+			bill_left_or_right = random.randrange(0,2)
+			if bill_left_or_right == 0:
+				billX = 0
+			else:
+				billX = display_width
+
+			if random.randrange(0,11) == 10:
+				billY = -200
+			else:
+				billY = -2000
+			
+			
+
+
 		enemyBlueY += enemyBlue_speed
+
+		
 
 		if heroCarX > display_width - car_width or heroCarX < 0:
 			crash()
 
 		if enemyBlueY > display_height:
 			enemyBlueY = 0 - 74
+
 		if thing_starty > display_height:
 			thing_starty = 0 - thing_height
 			thing_startx = random.randrange(0,display_width)
 
 		if heroCarY <= thing_starty + thing_height:
-			print('step 1')
 			if heroCarX > thing_startx and heroCarX < (thing_startx + thing_width) or (heroCarX + car_width) > thing_startx and (heroCarX + car_width) < (thing_startx + thing_width):
 				print ('heroCarX crossover')
-				crash()
+				
 
 
 
