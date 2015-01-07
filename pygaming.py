@@ -14,7 +14,7 @@ red = (255,0,0)
 
 car_width = 74
 global_speed = 0 #speed everything falls at, increase to make things faster
-
+speed_counter = 0
 
 
 gameDisplay = pygame.display.set_mode((display_width,display_height))
@@ -24,8 +24,8 @@ pygame.display.set_caption('RaceToMILK')
 clock = pygame.time.Clock()
 
 carImg = pygame.image.load('racecar.png')
-enemycarImgYellow = pygame.image.load('racecarYellow.png')
-enemycarImgGreen = pygame.image.load('racecarGreen.png')
+enemyCarImgYellow = pygame.image.load('racecarYellow.png')
+enemyCarImgGreen = pygame.image.load('racecarGreen.png')
 enemyCarImgBlue = pygame.image.load('racecarBlue.png')
 billImg = pygame.image.load('bill.png')
 
@@ -71,10 +71,11 @@ def crash():
 def game_loop():
 	heroCarX = (display_width * 0.45)
 	heroCarY = (display_height - 74) #car is 74x74
-
+	global global_speed
+	global speed_counter
 
 	heroCarX_change = 0
-
+	
 	
 	
 
@@ -90,11 +91,19 @@ def game_loop():
 		billX = display_width
 
 	bill_speedY = 3 + global_speed
-	bill_speedX = 3
+	bill_speedX = 3 + global_speed
 
 	enemyBlueX = random.randrange(0, display_width - 74) #img is 74x74
 	enemyBlueY = -600
 	enemyBlue_speed = 7 + global_speed
+
+	enemyGreenX = random.randrange(0,display_width -74)
+	enemyGreenY = -3100
+	enemyGreen_speed = 10 + global_speed
+
+	enemyYellowX = random.randrange(0,display_width -74)
+	enemyYellowY = -6100
+	enemyYellow_speed = 13 + global_speed
 
 	thing_startx = random.randrange(0, display_width)
 	thing_starty = -600
@@ -129,6 +138,8 @@ def game_loop():
 
 		car(heroCarX,heroCarY)
 		enemyBlue(enemyBlueX,enemyBlueY)
+		enemyGreen(enemyGreenX,enemyGreenY)
+		enemyYellow(enemyYellowX,enemyYellowY)
 
 		
 		bill(billX,billY)
@@ -155,7 +166,8 @@ def game_loop():
 
 
 		enemyBlueY += enemyBlue_speed
-
+		enemyGreenY += enemyGreen_speed
+		enemyYellowY += enemyYellow_speed
 		
 
 		if heroCarX > display_width - car_width or heroCarX < 0:
@@ -163,19 +175,28 @@ def game_loop():
 
 		if enemyBlueY > display_height:
 			enemyBlueY = 0 - 74
+			enemyBlueX = random.randrange(0,display_width)
+			speed_counter += 1
+		if enemyGreenY > display_height:
+			enemyGreenY = -3100
+			enemyGreenX = random.randrange(0,display_width)
+			speed_counter += 1
+		if enemyYellowY > display_height:
+			enemyYellowY = -6100
+			enemyYellowX = random.randrange(0,display_width)
+			speed_counter += 1
 
 		if thing_starty > display_height:
 			thing_starty = 0 - thing_height
 			thing_startx = random.randrange(0,display_width)
-
+#bill.png is 55x142
 		if heroCarY <= thing_starty + thing_height:
 			if heroCarX > thing_startx and heroCarX < (thing_startx + thing_width) or (heroCarX + car_width) > thing_startx and (heroCarX + car_width) < (thing_startx + thing_width):
 				print ('heroCarX crossover')
-				
 
-
-
-
+		#if speed_counter == 10:
+			#global_speed += 1
+			speed_counter = 0
 
 
 		pygame.display.update()
